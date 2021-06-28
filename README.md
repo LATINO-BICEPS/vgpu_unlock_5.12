@@ -32,6 +32,51 @@ is [available here.](https://docs.google.com/document/d/1pzrWJ9h-zANCtyqRgS7Vzla
   driver alot. Install DKMS with the package manager in your OS.
 
 
+## Kernel 5.12 notes
+
+This section assumes you have gone through the vgpu_unlock wiki.
+
+Linux Kernel 5.12 removed `set_fs`, which prevented nvidia from using hacks to bypass the eventfd api.
+
+This repo has a specific [patch](twelve.patch) which may be used for users on kernel 5.12.
+
+Copy the patch to the folder which contains the vgpu driver related binaries.
+
+To apply to patch you must do the following:
+
+`./NVIDIA-Linux-x86_64-<version>-vgpu-kvm.run -x`
+
+This will create a new folder with the driver related files in `NVIDIA-Linux-x86_64-<version>-vgpu-kvm`
+
+```shell
+cd NVIDIA-Linux-x86_64-<version>-vgpu-kvm
+patch -p0 < ../twelve.patch
+```
+
+The module will still not build so you must do manual changes.
+```c
+#include <disclaimer.h>
+
+// Note that this change may or may not be illegal for an individual user to do.
+// I am not a lawyer and I am not responsible for any trouble you land in.
+```
+
+you must change the `MODULE_LICENSE` of `nvidia` & `nvidia-vgpu-vfio` modules to something that is compatible with `GPL-only` symbols, e.g `Dual MIT/GPL`.
+
+The files containing them for the respective modules are `kernel/nvidia/nv-frontend.c` and `kernel/nvidia-vgpu-vfio` ;)))
+
+Once the changes are applied, install the driver with the following command:
+
+`nvidia-installer --dkms`
+
+The rest of the procedure is same as the wiki.
+
+The merged driver is available here(you must still make the `MODULE_LICENSE` changes yourself):
+
+[https://drive.google.com/file/d/119I9SxxfQ-mheinVjRN3Woep7YsKl7FS/view?usp=sharing](https://drive.google.com/file/d/119I9SxxfQ-mheinVjRN3Woep7YsKl7FS/view?usp=sharing)
+
+Install it with `nvidia-installer --dkms`
+
 ## Installation:
 
 In the following instructions `<path_to_vgpu_unlock>` need to be replaced with
@@ -193,3 +238,27 @@ the PCI device ID in the decrypted data, reencrypt the blocks, regenerate the
 signature and insert the magic, blocks and signature into the table of vGPU
 capable magic values. And that's what they do.
 
+
+## Merged Driver notes
+
+You can generate merged drivers yourself as well!
+
+Note that the prerequisite is that you are atleast able to understand C and have some development experience
+
+The basic idea is to use the `grid` driver as a base, and merge all the diffs between it and the `vgpu-kvm` driver.
+
+Usage of `meld` is recommended
+
+You must copy all the files from `vgpu-kvm` driver to `grid` that are exclusive to `vgpu-kvm` (i.e not present in `grid`)
+
+the rest of the changes involve `Kbuild` and `.manifest` changes mostly. (there might be other changes as well!)
+`Kbuild` changes should be fairly easy to make (mostly additions from vgpu-kvm)
+
+`.manifest` changes should be made carefully.
+you shouldn't need to delete anything from this file.
+
+- add `nvidia-vgpu-vfio` to the list of modules near the top of the file.
+
+- Now add all the files that are missing in `grid`'s manifest from `vgpu-kvm`. Source files can be safely added. There might be same libraries but with different version. `grid`'s libraries should be preferred in such a case.
+
+If all goes well, the installation should succeed!
