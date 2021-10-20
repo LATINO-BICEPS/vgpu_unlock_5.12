@@ -6,7 +6,7 @@ sudo kernelstub --add-options "amd_iommu=on"
 ```
 Install dependencies:
 ```
-sudo apt install -y python3-pip && sudo pip3 install frida
+sudo apt install -y python3-pip libglvnd-dev && sudo pip3 install frida 
 ```
 Load these modules in `/etc/modules`:
 ```
