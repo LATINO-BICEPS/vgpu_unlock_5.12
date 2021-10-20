@@ -1,5 +1,33 @@
 # Installation for PopOS 
 
+Enable IOMMU:
+```
+sudo kernelstub --add-options "amd_iommu=on"
+```
+Install dependencies:
+```
+sudo apt install -y python3-pip && sudo pip3 install frida
+```
+Load these modules in `/etc/modules`:
+```
+vfio
+vfio_iommu_type1
+vfio_pci
+vfio_virqfd
+```
+Blacklist Nvidia drivers in `/etc/modprobe.d/blacklist.conf`:
+```
+blacklist nouveau
+```
+Save the changes and reboot:
+```
+update-initramfs -u -k all
+reboot
+```
+Check if it is enabled:
+```
+dmesg | grep -e DMAR -e IOMMU -e AMD-Vi
+```
 
 
 
