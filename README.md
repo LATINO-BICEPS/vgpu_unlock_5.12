@@ -169,6 +169,12 @@ dkms install -m nvidia -v <version>
 
 Reboot.
 
+Append this line to both `/lib/systemd/system/nvidia-vgpud.service` `/lib/systemd/system/nvidia-vgpu-mgr.service`
+```
+Environment="__RM_NO_VERSION_CHECK=1"
+```
+
+
 ---
 **NOTE**
 
