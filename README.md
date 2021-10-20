@@ -4,14 +4,19 @@ Downgrade to kernel 5.11:
 ```
 sudo apt install -y linux-image-5.11.0-7633-generic linux-headers-5.11.0-7633-generic linux-modules-5.11.0-7633-generic linux-modules-extra-5.11.0-7633-generic
 ```
-
+Use kernel 5.11 by editing `boot/efi/loader/loader.conf`:
+```
+# in /boot/efi/loader/loader.conf
+default Pop_OS-oldkern
+timeout 0
+```
 Enable IOMMU:
 ```
 sudo kernelstub --add-options "amd_iommu=on"
 ```
 Install dependencies:
 ```
-sudo apt install -y python3-pip libglvnd-dev && sudo pip3 install frida 
+sudo apt install -y vim python3-pip libglvnd-dev && sudo pip3 install frida 
 ```
 Load these modules in `/etc/modules`:
 ```
@@ -33,17 +38,6 @@ Check if it is enabled:
 ```
 dmesg | grep -e DMAR -e IOMMU -e AMD-Vi
 ```
-
-
-
-
-
-
-
-
-
-
-
 
 
 # Original
