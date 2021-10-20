@@ -1,5 +1,10 @@
 # Installation for PopOS 
 
+Downgrade to kernel 5.11:
+```
+sudo apt install -y linux-image-5.11.0-7633-generic linux-headers-5.11.0-7633-generic linux-modules-5.11.0-7633-generic linux-modules-extra-5.11.0-7633-generic
+```
+
 Enable IOMMU:
 ```
 sudo kernelstub --add-options "amd_iommu=on"
