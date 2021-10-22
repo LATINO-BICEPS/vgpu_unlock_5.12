@@ -2,7 +2,7 @@
 
 Downgrade to kernel 5.11:
 ```
-sudo apt install -y linux-image-5.11.0-7633-generic linux-headers-5.11.0-7633-generic linux-modules-5.11.0-7633-generic linux-modules-extra-5.11.0-7633-generic
+sudo apt install -y linux-image-5.11.0-7633-generic linux-headers-5.11.0-7633-generic linux-modules-5.11.0-7633-generic linux-modules-extra-5.11.0-7633-generic mdevctl
 ```
 Use kernel 5.11 by editing `boot/efi/loader/loader.conf`:
 ```
@@ -38,7 +38,26 @@ Check if it is enabled:
 ```
 dmesg | grep -e DMAR -e IOMMU -e AMD-Vi
 ```
+Unlock the GPU as described in the [guide](#original) then come back here.
 
+Start the mdev:
+```
+mdevctl start -u 1c1f3da7-b3c2-48f5-b948-9635f6797cad -p 0000:07:00.0 --type nvidia-49
+mdevctl start -u b24bb001-5f03-4e94-a5c6-63488b8adbb9 -p 0000:07:00.0 --type nvidia-49
+
+# to stop a mdev 
+mdevctl list
+mdevctl stop -u $UUID
+```
+Make it persistent:
+```
+mdevctl define --auto --uuid 1c1f3da7-b3c2-48f5-b948-9635f6797cad
+mdevctl define --auto --uuid b24bb001-5f03-4e94-a5c6-63488b8adbb9
+
+# to undefine it by its UUID
+mdevctl undefine -u $UUID
+```
+Edit the crontab to start the mdev at boot.
 
 # Original
 
